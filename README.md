@@ -44,11 +44,11 @@ The original intersection expression now can be expressed as
 
 > **(x<sub>b</sub> - x<sub>a</sub>)² + (y<sub>b</sub> - y<sub>a</sub>)² ≤ (r<sub>a</sub> + r<sub>b</sub>)²**
 
-The spheres intersection expression is exactly de same, but adding a new dimension (An sphere is a 3-dimensional object):
+For spheres, the expression is exactly de same, but adding a new dimension (An sphere is a 3-dimensional object):
 
 > **(x<sub>b</sub> - x<sub>a</sub>)² + (y<sub>b</sub> - y<sub>a</sub>)² + (z<sub>b</sub> - z<sub>a</sub>)² ≤ (r<sub>a</sub> + r<sub>b</sub>)²**
 
-The Intersection function, as a procedural programming language, will be:
+The Intersect function, as a procedural programming language, will be:
 
 ```pascal
 function intersect(a:Sphere, b:Sphere):boolean 
@@ -75,7 +75,7 @@ For sphere_a in spheres
 End
 ```
 
-Upps, this generates 2 pairs of spheres for each intersection.  Lets correct this
+Upps, this generates 2 pairs of spheres for each intersection.  Let's correct it this way
 
 ```pascal
 Var intersected := []
