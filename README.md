@@ -87,24 +87,50 @@ For a:=1 to count(spheres)-1
   End
 End
 ```
-Let **N** be the number of spheres, ***intertersect*** method will be called  N * (N-1) / 2 = (N²-N)/2. *Thats a **O(N²)** cost*
+Let **N** be the number of spheres, ***intertersect*** method will be called  N * (N-1) / 2 = (N²-N)/2 times. *Thats a **O(N²)** cost*
 
-## The Partition algorithm:  *O(n log(n) )*
+## The Partition algorithm
 
-O(n log n) algorithms are based, usually, in a partitioning strategy.
-i.e.:  
-> Quick Sort tries to partitionate dinamically the items in 3 sets:  {smaller elements}, {The pivot element}, {bigger elements}.  In each iteration the {smaller} and {bigger} sets are "re-partitioned" until we achieve empty sets.  
-> The total number of sets required to acomplish the objective is, usually, an O(n log(n)) number, although in some cases  (the worst ones) it achieves a O(n²) number.
-
-In our case, the strategy is to generate **"potential" intersection groups of spheres** (our "**partitions**"). 
+The strategy is to generate **"potential" intersection groups of spheres** (our "**partitions**"). 
 
 * Each sphere belongs to one or more partitions.
-* Two spheres intersect only if they share, at least, one partition.
+* Two spheres CAN intersect if they share, at least, one partition.
 
 As a corolay
 
 *  Two spheres will not intersect if they don't share any partition.
 
+A possible algorithm based on partitions
+
+```
+var intersections = [];
+var partitioner := Partitioner(spheres);
+
+foreach sphere_a in spheres
+  foreach partition in partitioner.validSpherePartitions(sphere_a)
+    foreach sphere_b in partition.spheres
+      if(intersect(sphere_a, sphere_b))
+        intersections.add( Tuple(sphere_a, sphere_b ));
+      end
+    end
+
+    partition.add(sphere_a);
+  end
+end
+```
+
+The number of times we call "intersect" method is **O(S * P * M)** where
+* **S** = Number of Spheres
+* **P** = Number of partitions where each sphere is located
+* **M** = Number of Spheres in each partition.
+
+There are 2 extreme situations:
+1. **Best**: There is no collision. Implies **M=1** and the complexity will be O(P * S)
+2. **Worst**: All spheres collide with each other. Implies **M=S** and the complexity will be O(P * S²)
+
+Because we can't change the number of collision, S and M depends on the data set (the spheres itself). 
+We only can work to improve the value of **P** tryint to obtain **P=1** (Each sphere in only one partition)
 
 
+      
 
