@@ -41,9 +41,9 @@ where
 
 * **d<sub>ab</sub>** is the distance between its centers.
 * **r<sub>a</sub>** is the radius of circle A
-* **r<sub>b</sub>** is the radius of circle A
+* **r<sub>b</sub>** is the radius of circle B
 
-If we use the coordinates of the centers ( **(x<sub>a</sub>,y<sub>a</sub>)** and **(x<sub>b</sub>,y<sub>b</sub>)** ) , the **distance between their centers** can be solved using Pythagorean theorem:
+If we use the coordinates of the centers **(x<sub>a</sub>,y<sub>a</sub>)** and **(x<sub>b</sub>,y<sub>b</sub>)**, the **distance between their centers** can be solved using Pythagorean theorem:
 
 >  (x<sub>b</sub> - x<sub>a</sub>)² + (y<sub>b</sub> - y<sub>a</sub>)² = d²<sub>ab</sub>
 
