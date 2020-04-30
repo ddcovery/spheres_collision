@@ -12,11 +12,11 @@ namespace collisions
       Sphere[] spheres = Utils.readFile("../data/spheres.dat");
 
       Utils.crono("O(n*log(n))", () => detectUsingPartitions(spheres));
-      Utils.crono("O(n^2)", () => detectUsingNxN(spheres));
+      Utils.crono("O(n^2)", () => detectUsingBruteforce(spheres));
 
       Console.ReadKey();
     }
-    static List<Tuple<int, int>> detectUsingNxN(in Sphere[] spheres)
+    static List<Tuple<int, int>> detectUsingBruteforce(in Sphere[] spheres)
     {
       var collision = new List<Tuple<int, int>>();
       for (int i = 0; i < spheres.Length; i++)
