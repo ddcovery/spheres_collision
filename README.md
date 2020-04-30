@@ -73,11 +73,11 @@ end
 Given a set of N spheres, a brute force Algorithm will check the intersection of all possible spheres pairs
 
 ```pascal
-Var intersections=[];
+Var intersected := []
 For sphere_a in spheres
   For sphere_b in spheres
     If( sphere_a != sphere_b and intersect(sphere_a, sphere_b) )      
-      intersections.add( Pair(sphere_a, sphere_b) );
+      intersected.add( Pair(sphere_a, sphere_b) );
     End
   End
 End
@@ -86,11 +86,11 @@ End
 Upps, this generates 2 pairs of spheres for each intersection.  Lets correct this
 
 ```pascal
-Var intersections := []
+Var intersected := []
 For a:=1 to count(spheres)-1
   For b:=a+1 to count(spheres)
     If intersect( spheres[a], spheres[b])
-      intersections.add( Pair(spheres[a], spheres[b]) )
+      intersected.add( Pair(spheres[a], spheres[b]) )
     End
   End
 End
