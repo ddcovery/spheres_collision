@@ -11,66 +11,65 @@ namespace collisions
   /// </summary>
   public class Partitioner
   {
-    // Minimum X ocupied by some sphere
-    private float minX;
-    // Number of partitions
-    private int partsCount;
-    // Width in X axis of each partition
-    private float partSize;
+    // The minimum partitionable x
+    float x_min;
+    // The maximum partitionable x 
+    float x_max;
+    // The size of each partition
+    float size;
+
+    int count;
+
+    bool noSpheres = false;
 
     public Partitioner(Sphere[] spheres)
     {
-      calculatePartitionerParams(spheres);
+      init(spheres);
     }
 
     /// <summary>The number of partitions</summary>
-    public int getCount() =>
-      partsCount;
+    public int getCount() => count;
+    //1+getValuePartitionN(this.x_max);
 
 
     /// <summary>Wich partitions the sphere is located into.</summary>
     /// <returns>The interval [min, max] of partitions where spere is located</returns>
     public Interval getSpherePartitionsInterval(Sphere sphere) =>
-      new Interval(value2partitionNumber(sphere.x - sphere.r), value2partitionNumber(sphere.x + sphere.r));
+      new Interval(getValuePartitionN(sphere.x - sphere.r), getValuePartitionN(sphere.x + sphere.r));
 
 
 
-    private void calculatePartitionerParams(in Sphere[] spheres)
+    private void init(in Sphere[] spheres)
     {
-      var min = spheres[0].x - spheres[0].r;
-      var max = spheres[0].x + spheres[0].r;
-      var r_max = spheres[0].r;
-      var r_sum = spheres[0].r;
-      for (int ix = 1; ix < spheres.Length; ix++)
+      if (spheres.Length == 0)
       {
-        var left = spheres[ix].x - spheres[ix].r;
-        if (left < min)
-        {
-          min = left;
-        }
-        var right = spheres[ix].x + spheres[ix].r;
-        if (right > max)
-        {
-          max = right;
-        }
-        if (spheres[ix].r > r_max)
-        {
-          r_max = spheres[ix].r;
-        }
-        r_sum += spheres[ix].r;
+        this.noSpheres = true;
+        this.count = 1;
       }
-      // Average diameter  (r*2) is used as partition size (with an small "variance" increment).
-      var avg = 2 * r_sum / spheres.Length;
-      var size = 1.1 * avg;
+      else
+      {
+        float x_min = spheres[0].x;
+        float x_max = spheres[0].x;
+        float r_sum = spheres[0].r;
+        for (var n = 1; n < spheres.Length; n++)
+        {
+          if (spheres[n].x < x_min) x_min = spheres[n].x;
+          if (spheres[n].x > x_max) x_max = spheres[n].x;
+          r_sum += spheres[n].r;
+        }
 
-      this.partsCount = Math.Max(1, (int)Math.Round((max - min) / size)); ;
-      this.partSize = (float)Math.Ceiling((max - min) / (float)this.partsCount);
-      this.minX = min;
+        float avg = (r_sum * 2) / spheres.Length;
+        this.x_min = x_min;
+        this.x_max = x_max;
+        this.size = 1.1f * avg; 
+
+        this.count = 1 + (int)Math.Ceiling((x_max - x_min) / size);
+      }
     }
 
-    private int value2partitionNumber(float x)
+    private int getValuePartitionN(float x)
     {
-      return this.partSize != 0 ? (int)Math.Floor((x - this.minX) / this.partSize) : 0;
+      return noSpheres ? 0 : (int)((x - x_min) / size);
     }
   }
 
