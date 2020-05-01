@@ -91,6 +91,8 @@ Let **N** be the number of spheres, ***intertersect*** method will be called  N 
 
 ## The Partition algorithm
 
+### The algorithm
+
 The strategy is to generate **"potential" intersection groups of spheres** (our "**partitions**"). 
 
 * Each sphere belongs to one or more partitions.
@@ -100,10 +102,10 @@ As a corolay
 
 *  Two spheres will not intersect if they don't share any partition.
 
-A possible algorithm based on partitions
+A possible algorithm based on partitions:
 
 ```
-var intersections = [];
+var intersections := [];
 var partitioner := Partitioner(spheres);
 
 foreach sphere_a in spheres
@@ -119,6 +121,8 @@ foreach sphere_a in spheres
 end
 ```
 
+### The Complexity
+
 The number of times we call "intersect" method is **O(S * P * M)** where
 * **S** = Number of Spheres
 * **P** = Number of partitions where each sphere is located
@@ -128,8 +132,54 @@ There are 2 extreme situations:
 1. **Best**: There is no collision. Implies **M=1** and the complexity will be O(P * S)
 2. **Worst**: All spheres collide with each other. Implies **M=S** and the complexity will be O(P * S²)
 
-Because we can't change the number of collision, S and M depends on the data set (the spheres itself). 
-We only can work to improve the value of **P** tryint to obtain **P=1** (Each sphere in only one partition)
+**S** and **M** depends on the data set (the spheres itself): we can do nothing to change the number of spheres and the numer of collisions. 
+
+We only can work to improve the value of **P** tryint to obtain **P=1** (Each sphere is located in 1 partition) and this is what the ```Partitioner``` has to achive
+
+### Linear partition size
+
+Partitioner must analyze all spheres and decide the best way to group them. The first poposal (used originally in my "javascript" solver) is to represent each sphere as a "segment" in the X axis (We can also choose Y or Z).
+
+We define the "segment" of an sphere as **[x-r, x+r]** where:
+* **x** is the X coordinate of the central point of the sphere
+* **r** is the sphere radius
+* **2*r** is the segment "size": max-min = (x+r) - (x-r) = 2 * r
+
+The idea is to project each possible X value to an Integer that represents a partition (p<sub>x</sub>):
+* p<sub>x</sub> = f( x )
+* p<sub>x</sub> is Integer
+* x1 < x2 → p<sub>x1</sub> ≤ p<sub>x2</sub> 
+
+An sphere segment will be projected to an interval of integer numbers:
+
+* [p<sub>min</sub> , p<sub>max</sub>] = [f(x-r) , f(x+r)])
+* p<sub>min</sub> ≤ p<sub>min</sub>
+
+A possible partition function can be p<sub>x</sub> = [ (x - x<sub>min</sub>) / size ) ] where
+
+* x<sub>min</sub> is the minimum x coordinate of any sphere segment.
+* size is (x<sub>max</sub> - x<sub>min</sub>) /  Average<sub>spheres</sub>( 2 * r )
+
+This function requires a previous spheres analisis to deduce x<sub>min</sub>, x<sub>max</sub> and Average.  The cost of this analisis is N (where N is the number of spheres)
+
+¿why?
+
+* We suposse that spheres diameter (2*radius) has a very low variance (all radius are very similar).
+* We suposse that spheres x coordinate follows an uniform distribution too.
+
+An "small" adjustment is to multiply average by 1.1 factor (supossing a constant variance):
+* Using average as partition size causes a lot of spheres to occupy 3 partitions instead 2 partitions. 
+* Using a value bigger than average minimizes this problem.
+
+### Adaptative partition size
+
+Previous solution suposes an uniform distribution of the spheres in the X axis.
+
+
+
+
+
+
 
 
       
