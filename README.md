@@ -232,7 +232,7 @@ Class Partitioner
 End
 ```
 
-The partition based algorithm variates from the original because "partitoner" treats partition numbers, and we have to manage the sphere collections manually:
+The partition based algorithm differs from the original because "partitoner" treats partition as numbers, and we have to manage the partitions sphere collections manually:
 
 ```pascal
 Var intersections := [];
