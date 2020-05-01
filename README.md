@@ -104,21 +104,21 @@ As a corolay
 
 A possible algorithm based on partitions:
 
-```
-var intersections := [];
-var partitioner := Partitioner(spheres);
+```pascal
+Var intersections := [];
+Var partitioner := Partitioner(spheres);
 
-foreach sphere_a in spheres
-  foreach partition in partitioner.validSpherePartitions(sphere_a)
-    foreach sphere_b in partition.spheres
-      if(intersect(sphere_a, sphere_b))
+For sphere_a in spheres
+  For partition in partitioner.validSpherePartitions(sphere_a)
+    For sphere_b in partition.spheres
+      If intersect(sphere_a, sphere_b)
         intersections.add( Tuple(sphere_a, sphere_b ));
-      end
-    end
+      End
+    End
 
-    partition.add(sphere_a);
-  end
-end
+    Partition.add(sphere_a);
+  End
+End
 ```
 
 ### The Complexity
@@ -162,21 +162,99 @@ A possible partition function can be p<sub>x</sub> = [ (x - x<sub>min</sub>) / s
 
 This function requires a previous spheres analisis to deduce x<sub>min</sub>, x<sub>max</sub> and Average.  The cost of this analisis is N (where N is the number of spheres)
 
-¿why?
+Assumed supositions
 
 * We suposse that spheres diameter (2*radius) has a very low variance (all radius are very similar).
-* We suposse that spheres x coordinate follows an uniform distribution too.
+* We suposse that spheres **x** coordinate has an uniform distribution too.
 
 An "small" adjustment is to multiply average by 1.1 factor (supossing a constant variance):
-* Using average as partition size causes a lot of spheres to occupy 3 partitions instead 2 partitions. 
+* Using average as partition size causes a lot of spheres to occupy 3 partitions instead 2. 
 * Using a value bigger than average minimizes this problem.
 
-### Adaptative partition size
+Summary:
+* **p<sub>x</sub> = [ (x - x<sub>min</sub>) / size ) ]**  (note: ***[ a ]*** is the integer part ***a***)
+* **x<sub>min</sub>** is the minimum x coordinate of any sphere segment
+* **size** is **(x<sub>max</sub> - x<sub>min</sub>) /  (1.1 * AVERAGE<sub>spheres</sub>( 2 * r ) )**
 
-Previous solution suposes an uniform distribution of the spheres in the X axis.
 
+The partitioner class
 
+```pascal
+Class Partitioner
+  // The minimum partitionable x
+  Var x_min:Real
+  // The maximum partitionable x 
+  Var x_max:Real
+  // The size of each partition
+  Var size:Real
 
+  // How many partitions are there.
+  Public Function count():Integer
+    Return partition_n( this.x_max )
+  End
+  // Sphere partitions interval [pmin, pmax]
+  Public Function sphere_partitions_n(sphere: Sphere): Tuple<Integer,Integer>
+    Var min:integer := partition_n(sphere.x - sphere.r)
+    Var max:integer := partition_n(sphere.x + sphere.r)
+    Return Tuple(min, max)
+  end
+
+  // Class initializer
+  constructor(spheres: Sphere[])
+
+    If count(spheres) == 0 then
+      this.x_min = +Infinite
+      this.size = +Infinite      
+    Else
+      Var x_min: real := spheres[1].x
+      Var x_max: real := spheres[1].x
+      Var r_sum: real := spheres[1].r
+      For n:=2 To count(spheres)
+        If sphere.x<x_min Then x_min:=sphere.x
+        If sphere.x>x_max Then x_max:=sphere.x
+        r_sum := r_sum + r
+      End
+      Var avg = ( r_sum * 2 ) / count(spheres);
+      this.x_min := x_min
+      this.x_max := x_max
+      this.size := (x_max - x_min) / (1.1 * avg)
+    End
+  End 
+  // Gets the partition number associated to an x value
+  // remarks: Partition is 1 for the first one.
+  Function partition_n(x:Real):Integer
+    If this.size==+Infinite Then
+      Return 1;
+    Else
+      Return 1 + Integer( (x-x_min) / size )
+    End
+  End
+End
+```
+
+The partition based algorithm variates from the original because "partitoner" treats partition numbers, and we have to manage the sphere collections manually:
+
+```pascal
+Var intersections := [];
+Var partitioner := Partitioner(spheres);
+Var partitions :=[]
+// Initialize partitions (Array of N empty arrays )
+For p_n:=1 to partitioner.count()
+  partitions.add( [] );
+End
+// 
+For sphere_a in spheres
+  Var p_interval := partitioner.sphere_partitions_n(sphere_a)
+  For p_n:=p_interval[1] to p_interval[2]
+    For sphere_b in partitions[p_n]
+      If(intersect(sphere_a, sphere_b))
+        intersections.add( Tuple(sphere_a, sphere_b ));
+      End
+    End
+    partitions[p_n].add(sphere_a);
+  End
+End
+```
 
 
 
