@@ -11,8 +11,8 @@ namespace collisions
     {
       Sphere[] spheres = Utils.readFile("../data/spheres.dat");
 
-      Utils.crono("O(n*log(n))", () => detectUsingPartitions(spheres));
-      Utils.crono("O(n^2)", () => detectUsingBruteforce(spheres));
+      Utils.crono("Using partitions", () => detectUsingPartitions(spheres));
+      Utils.crono("Using brute force", () => detectUsingBruteforce(spheres));
 
       Console.ReadKey();
     }
@@ -42,7 +42,7 @@ namespace collisions
       {
         detectAndInsert(sphere);
       }
-
+     
       return collisions;
 
       void detectAndInsert(in Sphere sphere)

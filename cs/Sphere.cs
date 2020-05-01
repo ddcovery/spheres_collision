@@ -1,6 +1,5 @@
 namespace collisions
 {
-
   public struct Sphere
   {
     readonly public int id;
@@ -24,13 +23,11 @@ namespace collisions
   {
     public static bool CollidesWith(in this Sphere a, in Sphere b)
     {
-
       float d_x = b.x - a.x;
       float d_y = b.y - a.y;
       float d_z = b.z - a.z;
       float a_r = b.r + a.r;
       return d_x * d_x + d_y * d_y + d_z * d_z < a_r * a_r;
     }
-
   }
 }

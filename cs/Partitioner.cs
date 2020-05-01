@@ -39,7 +39,8 @@ namespace collisions
     {
       var min = spheres[0].x - spheres[0].r;
       var max = spheres[0].x + spheres[0].r;
-      var r = spheres[0].r;
+      var r_max = spheres[0].r;
+      var r_sum = spheres[0].r;
       for (int ix = 1; ix < spheres.Length; ix++)
       {
         var left = spheres[ix].x - spheres[ix].r;
@@ -52,16 +53,18 @@ namespace collisions
         {
           max = right;
         }
-        if (spheres[ix].r > r)
+        if (spheres[ix].r > r_max)
         {
-          r = spheres[ix].r;
+          r_max = spheres[ix].r;
         }
+        r_sum += spheres[ix].r;
       }
-      // Bigger sphere width (r*2) is used as partition size.
+      // Average diameter  (r*2) is used as partition size (with an small "variance" increment).
+      var avg = 2 * r_sum / spheres.Length;
+      var size = 1.1 * avg;
 
-
-      this.partsCount = Math.Max(1, (int)Math.Round((max - min) / (r * 2)));
-      this.partSize = (int)Math.Round((max - min) / (float)partsCount);
+      this.partsCount = Math.Max(1, (int)Math.Round((max - min) / size)); ;
+      this.partSize = (float)Math.Ceiling((max - min) / (float)this.partsCount);
       this.minX = min;
     }
 
