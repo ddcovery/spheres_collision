@@ -44,11 +44,11 @@ The original intersection expression now can be expressed as
 
 > **(x<sub>b</sub> - x<sub>a</sub>)² + (y<sub>b</sub> - y<sub>a</sub>)² ≤ (r<sub>a</sub> + r<sub>b</sub>)²**
 
-For spheres, the expression is exactly de same, but adding a new dimension (An sphere is a 3-dimensional object):
+For spheres, the expression is exactly de same, but adding a new dimension (sphere center is an (x,y,z) point):
 
 > **(x<sub>b</sub> - x<sub>a</sub>)² + (y<sub>b</sub> - y<sub>a</sub>)² + (z<sub>b</sub> - z<sub>a</sub>)² ≤ (r<sub>a</sub> + r<sub>b</sub>)²**
 
-The Intersect function, as a procedural programming language, will be:
+The ```intersect``` function, as a procedural programming language, will be:
 
 ```pascal
 function intersect(a:Sphere, b:Sphere):boolean 
@@ -143,7 +143,7 @@ Partitioner must analyze all spheres and decide the best way to group them. The 
 We define the "segment" of an sphere as **[x-r, x+r]** where:
 * **x** is the X coordinate of the central point of the sphere
 * **r** is the sphere radius
-* **2*r** is the segment "size": max-min = (x+r) - (x-r) = 2 * r
+* The segment size is **2*r**, the sphere **diameter**
 
 The idea is to project each possible X value to an Integer that represents a partition (p<sub>x</sub>):
 * p<sub>x</sub> = f( x )
@@ -157,8 +157,8 @@ An sphere segment will be projected to an interval of integer numbers:
 
 A possible partition function can be p<sub>x</sub> = [ (x - x<sub>min</sub>) / size ) ] where
 
-* x<sub>min</sub> is the minimum x coordinate of any sphere segment.
-* size is (x<sub>max</sub> - x<sub>min</sub>) /  Average<sub>spheres</sub>( 2 * r )
+* **x<sub>min</sub>** is the minimum x coordinate of any sphere segment.
+* **size** is **Average<sub>spheres</sub>( 2 * r )**
 
 This function requires a previous spheres analisis to deduce x<sub>min</sub>, x<sub>max</sub> and Average.  The cost of this analisis is N (where N is the number of spheres)
 
@@ -174,7 +174,7 @@ An "small" adjustment is to multiply average by 1.1 factor (supossing a constant
 Summary:
 * **p<sub>x</sub> = [ (x - x<sub>min</sub>) / size ) ]**  (note: ***[ a ]*** is the integer part ***a***)
 * **x<sub>min</sub>** is the minimum x coordinate of any sphere segment
-* **size** is **(x<sub>max</sub> - x<sub>min</sub>) /  (1.1 * AVERAGE<sub>spheres</sub>( 2 * r ) )**
+* **size** is **1.1 * AVERAGE<sub>spheres</sub>( 2 * r )**
 
 
 The partitioner class
@@ -217,7 +217,7 @@ Class Partitioner
       Var avg = ( r_sum * 2 ) / count(spheres);
       this.x_min := x_min
       this.x_max := x_max
-      this.size := (x_max - x_min) / (1.1 * avg)
+      this.size := 1.1 * avg;
     End
   End 
   // Gets the partition number associated to an x value
@@ -232,7 +232,9 @@ Class Partitioner
 End
 ```
 
-The partition based algorithm differs from the original because "partitoner" treats partition as numbers, and we have to manage the partitions sphere collections manually:
+The algorithm based on partitions must me adapted to the new "partitioner" that treats partition as a number.
+
+In the new version, we have to manage "manually" te partitions spheres using "dynamic" arrays
 
 ```pascal
 Var intersections := [];
