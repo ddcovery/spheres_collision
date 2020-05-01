@@ -136,7 +136,7 @@ There are 2 extreme situations:
 
 We only can work to improve the value of **P** tryint to obtain **P=1** (Each sphere is located in 1 partition) and this is what the ```Partitioner``` has to achive
 
-### Linear partition size
+### Linear partition function
 
 Partitioner must analyze all spheres and decide the best way to group them. The first poposal (used originally in my "javascript" solver) is to represent each sphere as a "segment" in the X axis (We can also choose Y or Z).
 
