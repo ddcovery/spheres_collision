@@ -11,7 +11,7 @@ namespace collisions
     {
       Sphere[] spheres = Utils.readFile("../data/spheres.dat");
 
-      Utils.crono("Using partitions", () => detectUsingPartitions(spheres));
+      Utils.crono("Using partitions", () => detectUsingPartitions(spheres), 100);
       Utils.crono("Using brute force", () => detectUsingBruteforce(spheres));
 
       Console.ReadKey();
@@ -49,7 +49,7 @@ namespace collisions
       {
         var intersected = new HashSet<int>();
         Interval interval = partitioner.getSpherePartitionsInterval(sphere);
-
+  
         for (var partIdx = interval.min; partIdx <= interval.max; partIdx++)
         {
           var partitionSpheres = partitions[partIdx];

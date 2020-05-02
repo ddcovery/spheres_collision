@@ -8,17 +8,21 @@ namespace collisions
 {
   public static class Utils
   {
-    public static List<Tuple<int, int>> crono(string title, Func<List<Tuple<int, int>>> method)
+    public static List<Tuple<int, int>> crono(string title, Func<List<Tuple<int, int>>> method, int times=1)
     {
       Console.WriteLine(title);
+      
       var sw = new Stopwatch();
       sw.Start();
       var result = method();
+      for(var iterations=1;iterations<times;iterations++){
+        result = method();
+      }
       sw.Stop();
       result.ForEach(collision =>
         Console.WriteLine("  {0} collides with {1}", collision.Item1, collision.Item2)
       );
-      Console.WriteLine("{0}ms", sw.ElapsedMilliseconds);
+      Console.WriteLine("lapsed: {0}ms, times:{1}, median:{2}ms ", sw.ElapsedMilliseconds, times, sw.ElapsedMilliseconds/times);
       return result;
     }
 
