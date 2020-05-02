@@ -109,21 +109,31 @@ As a corolay
 A possible algorithm based on groups:
 
 ```pascal
-Var intersections := [];
-Var partitioner := Partitioner(spheres);
-
+Var collitions := [];
+Var partitioner := new Partitioner(spheres);
 For sphere_a in spheres
-  For group in partitioner.potentialSphereGroups(sphere_a)
-    For sphere_b in group.spheres
-      If intersect(sphere_a, sphere_b)
-        intersections.add( Tuple(sphere_a, sphere_b ));
-      End
-    End
-
-    group.add(sphere_a);
+  For sphere_b in collidedSpheres(sphere_a, partitioner)
+    collitions.add( Pair(sphere_a, sphere_b ));
   End
 End
+
+Function collidedSpheres(sphere, partitioner) as
+  Var collided := []
+  For group in partitioner.getSphereGroups(sphere)
+    For sphere_b in group     
+      If intersect(sphere, sphere_b) && !collided.contains(sphere_b)
+        collided.add(sphere_b)
+      End
+    End
+    group.add(sphere);
+  End
+
+  Return collided;
+End
 ```
+Note than:
+* Initially, ``partitioner`` contains empty groups:  each sphere is added to a group AFTER checking possible collitions. For this reason, 2 spheres are not processed in "different" order  (When you process Sphere[1], Sphere[2] has not been processed yet and it is not present in any group).
+* Because 2 spheres can share 2 or more groups, it is required to check  ``!collided.contains(sphere_b)``.  This is cleanly a performance Issue that must be solved in each concrete implementation (i.e:  Hash<int> that stores an unique "key" associated to the sphere 
 
 ### The Complexity
 
@@ -178,29 +188,30 @@ An sphere segment will be projected to an interval of integer numbers:
 * [p<sub>min</sub> , p<sub>max</sub>] = [f(x-r) , f(x+r)])
 * p<sub>min</sub> **≤** p<sub>max</sub>
 
-A possible partition function can be p<sub>x</sub> = [ (x - x<sub>min</sub>) / size ) ] where
+A possible partition function can be **p<sub>x</sub> = [ (x - x<sub>min</sub>) / size ) ]** where
 
 * **x<sub>min</sub>** is the minimum x value contained in all segments.
 * **size** is **Average<sub>spheres</sub>( 2 * r )**
 
-This function requires a previous spheres analisis to deduce x<sub>min</sub>, x<sub>max</sub> and Average.  The cost of this analisis is N (where N is the number of spheres)
+This "partition" function generates partitions of the same "size". It works efficiently under some supossitions:
 
-Assumed supositions
-
-* We suposse that spheres diameter (2*radius) has a very low variance (all radius are very similar).
-* We suposse that spheres **x** coordinate has an uniform distribution too.
+* Spheres radius **r** has a very low variance (all radius are very similar).
+* Spheres **x** coordinate has an uniform distribution (All partitions contain a similar number of spheres).
 
 An "small" adjustment is to multiply average by 1.1 factor (supossing a constant variance):
 * Using average as partition size causes a lot of spheres to occupy 3 partitions instead 2. 
 * Using a value bigger than average minimizes this problem.
 
-Summary:
-* **p<sub>x</sub> = [ (x - x<sub>min</sub>) / size ) ]**  (note: ***[ a ]*** is the integer part ***a***)
-* **x<sub>min</sub>** is the minimum x coordinate of any sphere segment
-* **size** is **1.1 * AVERAGE<sub>spheres</sub>( 2 * r )**
 
+> Summary:
+> * **p<sub>x</sub> = [ (x - x<sub>min</sub>) / size ) ]**  (note: ***[ a ]*** is the integer part of ***a***)
+> * **x<sub>min</sub>** is the minimum x coordinate of any sphere segment
+> * **size** is **1.1 * AVERAGE<sub>spheres</sub>( 2 * r )**
 
-The partitioner class
+We propose a class that calculates the partitioning parameters and provides functions to 
+* The total number of partitions
+* The partitions interval of an sphere.
+The initializacion requires an spheres analisis to deduce **x<sub>min</sub>**, **size** and the total number of partitions.  The cost of this analisis is N (where N is the number of spheres).
 
 ```pascal
 Class Partitioner
@@ -225,7 +236,7 @@ Class Partitioner
   // Class initializer
   constructor(spheres: Sphere[])
 
-    If count(spheres) == 0 then
+    If count(spheres) == 0
       this.x_min = +Infinite
       this.size = +Infinite      
     Else
@@ -246,16 +257,15 @@ Class Partitioner
   // Gets the partition number associated to an x value
   // remarks: Partition is 1 for the first one.
   Function partition_n(x:Real):Integer
-    If this.size==+Infinite Then
-      Return 1;
-    Else
-      Return 1 + Integer( (x-x_min) / size )
-    End
+    Return 1 + Integer( (x-x_min) / size )
   End
 End
 ```
+**Remarks**:  Partitioner requires, at least, 1 sphere to work
 
-The algorithm based on partitions must me adapted to the new "partitioner" that treats partition as a number.
+## The final algorithm
+
+The algorithm based on partitions must me adapted to the proposed "partitioner" that treats partition as a number.
 
 In the new version, we have to manage "manually" te partitions spheres using "dynamic" arrays
 
@@ -269,14 +279,18 @@ For p_n:=1 to partitioner.count()
 End
 // 
 For sphere_a in spheres
+  Var sphereIntersections = [];
   Var p_interval := partitioner.sphere_partitions_n(sphere_a)
   For p_n:=p_interval[1] to p_interval[2]
     For sphere_b in partitions[p_n]
-      If(intersect(sphere_a, sphere_b))
-        intersections.add( Tuple(sphere_a, sphere_b ));
+      If(intersect(sphere_a, sphere_b) && !sphereIntersections.contains(sphere_b))
+        sphereIntersections.add(sphere_b);
       End
     End
     partitions[p_n].add(sphere_a);
+  End
+  Foreach sphere_b in sphereIntersections
+    intersections.add( Tuple(sphere_a, sphere_b ));
   End
 End
 ```
