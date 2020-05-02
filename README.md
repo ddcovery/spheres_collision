@@ -17,13 +17,15 @@ This is, basically, a study to propose both algorithmic strategies and its imple
 
 ## The spheres intersection
 
+As we will see a little later, the different strategies try to minimize the number of times we have to verify if there is a collision between any 2 spheres. But before that, let's explain what it means that 2 spheres collide.
+
 Let's start with a simpliest problem:  2 circles intersection.
 
 If we express each circle as a center *(x,y)* and a radius *r*, how we can express a intersection condition?
 
 First, we need to find a formal definition for the "intersect" concept:
 
-> Two circles intersect when the **distance between its centers** is **smaller** than the **sum of their radii**.
+> Two circles intersect (collide) when the **distance between its centers** is **smaller** than the **sum of their radii**.
 
 That is:  
 
@@ -60,9 +62,10 @@ function intersect(a:Sphere, b:Sphere):boolean
   return x_diff * x_diff  +  y_diff * y_diff  +  z_diff * z_diff  <=  r_sum * r_sum
 end
 ```
-## The Brute force Algorithm
 
-Given a set of N spheres, a brute force Algorithm will check the intersection of all possible spheres pairs
+## The Brute Force Algorithm
+
+Given a set of N spheres, a brute force strategy will check the intersection of all possible spheres pairs
 
 ```pascal
 Var intersected := []
@@ -87,77 +90,97 @@ For a:=1 to count(spheres)-1
   End
 End
 ```
-Let **N** be the number of spheres, ***intertersect*** method will be called  N * (N-1) / 2 = (N²-N)/2 times. *Thats a **O(N²)** cost*
+
+Let **N** be the number of spheres, ***intertersect*** method will be called  *N * (N-1) / 2* = ***(N²-N)/2*** times. *Thats a **O(N²)** complexity*
 
 ## The Partition algorithm
 
 ### The algorithm
 
-The strategy is to generate **"potential" intersection groups of spheres** (our "**partitions**"). 
+The strategy is to generate **"potential" intersection groups of spheres**. 
 
-* Each sphere belongs to one or more partitions.
-* Two spheres CAN intersect if they share, at least, one partition.
+* Each sphere belongs to one or more groups.
+* Two spheres CAN intersect if they share, at least, one group.
 
 As a corolay
 
-*  Two spheres will not intersect if they don't share any partition.
+*  Two spheres will not intersect if they don't share any group.
 
-A possible algorithm based on partitions:
+A possible algorithm based on groups:
 
 ```pascal
 Var intersections := [];
 Var partitioner := Partitioner(spheres);
 
 For sphere_a in spheres
-  For partition in partitioner.validSpherePartitions(sphere_a)
-    For sphere_b in partition.spheres
+  For group in partitioner.potentialSphereGroups(sphere_a)
+    For sphere_b in group.spheres
       If intersect(sphere_a, sphere_b)
         intersections.add( Tuple(sphere_a, sphere_b ));
       End
     End
 
-    Partition.add(sphere_a);
+    group.add(sphere_a);
   End
 End
 ```
 
 ### The Complexity
 
-The number of times we call "intersect" method is **O(S * P * M)** where
+The number of times we call "intersect" method is **O(S × G<sub>s</sub> × S<sub>g</sub>)** where
 * **S** = Number of Spheres
-* **P** = Number of partitions where each sphere is located
-* **M** = Number of Spheres in each partition.
+* **G<sub>s</sub>** = Number of Groups where each Sphere is located
+* **S<sub>g</sub>** = Number of Spheres in each Group.
 
-There are 2 extreme situations:
-1. **Best**: There is no collision. Implies **M=1** and the complexity will be O(P * S)
-2. **Worst**: All spheres collide with each other. Implies **M=S** and the complexity will be O(P * S²)
+There are 2 extreme "ideal" situations:
+1. **Best**: There is no collision. Implies **S<sub>g</sub>=1** and the complexity will be **O(G<sub>s</sub> × S)**
+2. **Worst**: All spheres collide with each other. Each froup will contain all spheres. Thats **S<sub>g</sub>=S** and the complexity will be **O(G<sub>s</sub> × S²)**
 
-**S** and **M** depends on the data set (the spheres itself): we can do nothing to change the number of spheres and the numer of collisions. 
+**S** and **S<sub>g</sub>** depends on the data set (the spheres itself): we can do nothing to change the number of spheres and the numer of collisions. 
 
-We only can work to improve the value of **P** tryint to obtain **P=1** (Each sphere is located in 1 partition) and this is what the ```Partitioner``` has to achive
+We only can work to improve the value of **G<sub>s</sub>** tryint to obtain **G<sub>s</sub>=1** (Each sphere is located in only 1 group) and this is what the ```Partitioner``` has to achive
 
-### Linear partition function
+> Partitioner must analyze all spheres to find (ideally):
+> * The maximum number of not empty groups with the minimum number of spheres per group.
+> * Each sphere must be present in the minimum number of groups
+>
 
-Partitioner must analyze all spheres and decide the best way to group them. The first poposal (used originally in my "javascript" solver) is to represent each sphere as a "segment" in the X axis (We can also choose Y or Z).
+### Something suitable for comparing spheres
 
-We define the "segment" of an sphere as **[x-r, x+r]** where:
+First, we must encounter some **behaviour of the sphere** that is comparable (between 2 spheres) than will help us to discard immediatelly a potential collision.
+
+A proposal (used originally in my "javascript" solver) is to take the X axis projection of the sphere (we can also choose Y or Z).  This "projection" is a _segment_ **[x-r, x+r]** where:
 * **x** is the X coordinate of the central point of the sphere
 * **r** is the sphere radius
-* The segment size is **2*r**, the sphere **diameter**
+* The segment size is **2*r** that's the sphere **diameter**
 
-The idea is to project each possible X value to an Integer that represents a partition (p<sub>x</sub>):
+Given 2 spheres **A** and **B** we can make it comparable with a **custom "<" operator** that means **"completly left"**)
+* **A "<" B** if **x<sub>A</sub> + r<sub>A</sub> < x<sub>B</sub> - r<sub>B</sub>**
+
+![alt text](blobs/sphA_completlyleft_sphB.svg?raw=true)
+
+> Two spheres **can't collide** when **A is completly left B** or **B is completly left A** (A"<"B or B"<"A)
+
+and it's corollary
+
+> Two spheres **can collide** when (and only when) **A is not completly left B** and **B is not completly left A**  (!(A "<" B) and !(B "<" A))
+
+
+### The partition  
+
+We will project each possible **x** value to an Integer **p<sub>x</sub>** that represents a partition:
 * p<sub>x</sub> = f( x )
 * p<sub>x</sub> is Integer
-* x1 < x2 → p<sub>x1</sub> ≤ p<sub>x2</sub> 
+* **x1 < x2 <big>→</big> p<sub>x1</sub> ≤ p<sub>x2</sub>**
 
 An sphere segment will be projected to an interval of integer numbers:
 
 * [p<sub>min</sub> , p<sub>max</sub>] = [f(x-r) , f(x+r)])
-* p<sub>min</sub> ≤ p<sub>min</sub>
+* p<sub>min</sub> **≤** p<sub>max</sub>
 
 A possible partition function can be p<sub>x</sub> = [ (x - x<sub>min</sub>) / size ) ] where
 
-* **x<sub>min</sub>** is the minimum x coordinate of any sphere segment.
+* **x<sub>min</sub>** is the minimum x value contained in all segments.
 * **size** is **Average<sub>spheres</sub>( 2 * r )**
 
 This function requires a previous spheres analisis to deduce x<sub>min</sub>, x<sub>max</sub> and Average.  The cost of this analisis is N (where N is the number of spheres)
