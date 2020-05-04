@@ -2,12 +2,13 @@ const fs = require('fs');
 
 const spheres = readSpheres("../data/spheres.dat");
 
-withLogger("O(nLog)", logger => {
+withLogger("Partitioning", logger => {
   detectUsingPartitions(logger, spheres);
-}, 10);
+});
 
+console.log("\n");
 
-withLogger("O(n2)", logger => {
+withLogger("Brute force", logger => {
   for (var n = 0; n < spheres.length; n++) {
     for (var j = n + 1; j < spheres.length; j++) {
       if (intersects(spheres[n], spheres[j])) {

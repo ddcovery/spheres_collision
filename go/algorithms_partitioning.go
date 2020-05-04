@@ -49,7 +49,7 @@ func get_collisions_using_partitions(spheres []Sphere) list.List {
 	partitioner := newPartitioner(spheres)
 
 	for sphereA_n := 0; sphereA_n < len(spheres); sphereA_n++ {
-		// Hash to control wich pairs {a,b} has been added to intersections
+		// Hash to control wich b has been intersected with a previously
 		is_B_collided := make(map[int]bool)
 		interval := get_sphere_partitions(partitioner, spheres[sphereA_n])
 		for partitionN := interval.a; partitionN <= interval.b; partitionN++ {
