@@ -1,6 +1,6 @@
 using System;
 
-namespace collisions
+namespace collisions.algorithms
 {
   /// <summary>
   /// Associates to each sphere a numeric interval of integers [min, max] such than 
@@ -9,7 +9,7 @@ namespace collisions
   /// * Minimum possible partition is 0.
   /// * Maximum possible partition depends on the spheres.
   /// </summary>
-  public class Partitioner
+  internal class Partitioner
   {
     // The minimum partitionable x
     float x_min;

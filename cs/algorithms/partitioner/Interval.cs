@@ -1,6 +1,6 @@
-namespace collisions
+namespace collisions.algorithms
 {
-  public struct Interval
+  internal struct Interval
   {
     public readonly int min;
     public readonly int max;

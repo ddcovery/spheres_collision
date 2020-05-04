@@ -1,4 +1,5 @@
 
 ```
-go run spheres.go 
+go build
+./go
 ```

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"container/list"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"strconv"
@@ -14,28 +16,33 @@ func check(e error) {
 	}
 }
 
-type Sphere struct {
-	x float32
-	y float32
-	z float32
-	r float32
-}
+type collisions_detector func([]Sphere) list.List
 
 func main() {
 	spheres := readFile("../data/spheres.dat")
 	log.Printf("%d spheres \n", len(spheres))
+	log.Printf("\n")
+	logAlgorithm("Brute force", get_collisions_brute_force, spheres)
+	log.Printf("\n")
+	logAlgorithm("Partitioning", get_collisions_using_partitions, spheres)
 
+}
+
+func logAlgorithm(title string, fn collisions_detector, spheres []Sphere) {
+
+	log.Printf("%s\n", title)
 	start := time.Now()
-	for i := 0; i < len(spheres); i++ {
-		for j := i + 1; j < len(spheres); j++ {
-			if intersects(spheres[i], spheres[j]) {
-				log.Printf("%d intersects with %d \n", i, j)
-			}
-		}
+	intersections := fn(spheres)
+	tend := time.Since(start)
+
+	res := ""
+	for e := intersections.Front(); e != nil; e = e.Next() {
+		pair := e.Value.(IntsPair)
+		res += fmt.Sprintf("{%d,%d}", pair.a, pair.b)
 	}
-
-	log.Printf("Process took %s \n", time.Since(start))
-
+	log.Printf("%s", res)
+	log.Printf("Intersections %d\n", intersections.Len())
+	log.Printf("Process took %s \n", tend)
 }
 
 func readFile(path string) []Sphere {
@@ -58,12 +65,4 @@ func readFile(path string) []Sphere {
 		spheres[sphere_i] = Sphere{x: float32(x), y: float32(y), z: float32(z), r: float32(r)}
 	}
 	return spheres
-}
-
-func intersects(a Sphere, b Sphere) bool {
-	var dx = a.x - b.x
-	var dy = a.y - b.y
-	var dz = a.z - b.z
-	var sr = a.r + b.r
-	return dx*dx+dy*dy+dz*dz < sr*sr
 }
