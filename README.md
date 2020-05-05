@@ -133,7 +133,7 @@ End
 ```
 Note than:
 * Initially, ``partitioner`` contains empty groups:  each sphere is added to a group AFTER checking possible collitions. For this reason, 2 spheres are not processed in "different" order  (When you process Sphere[1], Sphere[2] has not been processed yet and it is not present in any group).
-* Because 2 spheres can share 2 or more groups, it is required to check  ``!collided.contains(sphere_b)``.  This is cleanly a performance Issue that must be solved in each concrete implementation (i.e:  Hash<int> that stores an unique "key" associated to the sphere 
+* Because 2 spheres can share 2 or more groups, it is required to check  ``!collided.contains(sphere_b)``.  This is cleanly a performance Issue that must be solved in each concrete implementation (i.e:  Hash<int> that stores an unique "key" associated to sphere_b)
 
 ### The Complexity
 
