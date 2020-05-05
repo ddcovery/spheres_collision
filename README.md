@@ -95,9 +95,9 @@ Let **N** be the number of spheres, ***intertersect*** method will be called  *N
 
 ## The Partition algorithm
 
-### The algorithm
+### The Strategy
 
-The strategy is to generate **"potential" intersection groups of spheres**. 
+We will generate **"potential" intersection groups of spheres**. 
 
 * Each sphere belongs to one or more groups.
 * Two spheres CAN intersect if they share, at least, one group.
@@ -178,22 +178,58 @@ and it's corollary
 
 ### The partition  
 
-We will project each possible **x** value to an Integer **p<sub>x</sub>** that represents a partition:
-* p<sub>x</sub> = f( x )
-* p<sub>x</sub> is Integer
-* **x1 < x2 <big>→</big> p<sub>x1</sub> ≤ p<sub>x2</sub>**
+If we take the minimum interval **[x<sub>min</sub>, x<sub>max</sub>]** containing all the X axis projections of the spheres, we can perform a segmentation just spliting it in **N** segments of size **Sz = (x<sub>max</sub> - x<sub>min</sub>) / N**
 
-An sphere segment will be projected to an interval of integer numbers:
+Each segment **seg<sub>a<sub>** is 
+* **[x<sub>min</sub> + Sz × (a-1), x<sub>min</sub> + Sz × a)** for **a < N**
+* **[x<sub>min</sub> + Sz × (a-1), x<sub>min</sub> + Sz × a]** for **a = N**
 
-* [p<sub>min</sub> , p<sub>max</sub>] = [f(x-r) , f(x+r)])
-* p<sub>min</sub> **≤** p<sub>max</sub>
+We obtain a set of segments **{seg<sub>1</sub>, seg<sub>2</sub>, ..., seg<sub>N</sub>}** such that **seg<sub>a</sub> "is completly left" seg<sub>b</sub>** if **a < b**
 
-A possible partition function can be **p<sub>x</sub> = [ (x - x<sub>min</sub>) / size ) ]** where
 
-* **x<sub>min</sub>** is the minimum x value contained in all segments.
-* **size** is **Average<sub>spheres</sub>( 2 * r )**
+An sphere is associated to all segments that intersect with its X axis projection
 
-This "partition" function generates partitions of the same "size". It works efficiently under some supossitions:
+* _Example:_
+  > ![Segments and Spheres example](blobs/spheres_and_segments.svg?raw=true)
+  >
+  > * Sphere A is associated to **seg<sub>1</sub>**
+  > * Sphere B is associated to **seg<sub>2</sub>**
+  > * Sphere C is associated to **seg<sub>2</sub>** and **seg<sub>3</sub>**
+
+Because segments acomplish the "is completly left" rule, 2 spheres that don't share, at least, one segment acomplish the same rule:
+
+Let Sphere **A** and **B** such than
+* Sphere **A** is associated to **seg<sub>a</sub>** but not to **seg<sub>b</sub>**
+* Sphere **B** is associated to **seg<sub>b</sub>** but not to **seb<sub>a</sub>**
+
+then, the two spheres acomplish that **a "<" b --> A "<" B**  (and vice versa)
+
+As a corolary, 
+
+> Two spheres CAN collide if (and only if) they share, at least, one segment
+
+Because the **X axis projection of an sphere is a continuous interval [x-r, x+r]**, we can afirm than the **set of segments that intersect with this interval is coninuous too**
+
+As a corolary,
+
+> If 2 spheres A and B don't share any segment, their segments {S<sub>A</sub>} ,{S<sub>B</sub>} meet the condition **{S<sub>A</sub>} "<" {S<sub>B</sub>} or {S<sub>B</sub>} "<" {S<sub>A</sub>}**
+
+### The partition size
+
+If we remember, the complexity of a partitioning algorithm is **O(S × G<sub>s</sub> × S<sub>g</sub>)**
+
+The value of the size of the partition (The segment size **Sz**) has a dramatic effect in the G<sub>s</sub> and S<sub>g</sub> values:
+
+* When **Sz is too big**, each segment will contain a great number of spheres that are mutually A "<" B:
+  * S<sub>g</sub> will tend to S
+  * G<sub>s</sub> will tend to 1
+  * O will tend to **O(S²)**
+* When **Sz is too small**, each sphere will be present in a great number of segments:
+  * S<sub>g</sub> will tend to 1
+  * G<sub>s</sub> will tend to S
+  * O will tend to **O(S²)**
+
+The best option is to adjust the size of each segment to a value next to a sphere size (it's diameter). It works efficiently under some supossitions:
 
 * Spheres radius **r** has a very low variance (all radius are very similar).
 * Spheres **x** coordinate has an uniform distribution (All partitions contain a similar number of spheres).
@@ -203,10 +239,10 @@ An "small" adjustment is to multiply average by 1.1 factor (supossing a constant
 * Using a value bigger than average minimizes this problem.
 
 
-> Summary:
-> * **p<sub>x</sub> = [ (x - x<sub>min</sub>) / size ) ]**  (note: ***[ a ]*** is the integer part of ***a***)
-> * **x<sub>min</sub>** is the minimum x coordinate of any sphere segment
-> * **size** is **1.1 * AVERAGE<sub>spheres</sub>( 2 * r )**
+> Summary:  Partition consists in a set of **N** segments of the same **size**
+> * **N = Ceil( (x_max - x_min) / size )**  (note: Ceil is the smallest integer greater than or equal to a given number.)
+> * **size** is **1.1 × Average<sub>spheres</sub>(2×r)**
+> * Given an sphere interval **[x-r, x+r]**, it is associated to the segments **1 + [ (x-r-x_min)/size ]** to **1 + [ (x+r-x_min)/size ]**
 
 We propose a class that calculates the partitioning parameters and provides functions to 
 * The total number of partitions
