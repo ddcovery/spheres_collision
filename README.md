@@ -218,7 +218,7 @@ As a corolary,
 
 If we remember, the complexity of a partitioning algorithm is **O(S × G<sub>s</sub> × S<sub>g</sub>)**
 
-The value of the size of the partition (The segment size **Sz**) has a dramatic effect in the G<sub>s</sub> and S<sub>g</sub> values:
+The value of the size of the partition (The segment size **Sz**) has a dramatical effect in the G<sub>s</sub> and S<sub>g</sub> values:
 
 * When **Sz is too big**, each segment will contain a great number of spheres that are mutually A "<" B:
   * S<sub>g</sub> will tend to S
@@ -229,20 +229,21 @@ The value of the size of the partition (The segment size **Sz**) has a dramatic 
   * G<sub>s</sub> will tend to S
   * O will tend to **O(S²)**
 
-The best option is to adjust the size of each segment to a value next to a sphere size (it's diameter). It works efficiently under some supossitions:
+The best option is to adjust the size of each segment to a value next to the average sphere size (it's diameter). It works efficiently under some supossitions:
 
 * Spheres radius **r** has a very low variance (all radius are very similar).
 * Spheres **x** coordinate has an uniform distribution (All partitions contain a similar number of spheres).
 
 An "small" adjustment is to multiply average by 1.1 factor (supossing a constant variance):
-* Using average as partition size causes a lot of spheres to occupy 3 partitions instead 2. 
+* Using average as partition size causes a lot of spheres to occupy 3 partitions instead 2 (because there is, potentially, half of spheres bigger than the average). 
 * Using a value bigger than average minimizes this problem.
 
 
-> Summary:  Partition consists in a set of **N** segments of the same **size**
+### Summary: 
+> Partition consists in a set of **N** segments of the same **size**
 > * **N = Ceil( (x_max - x_min) / size )**  (note: Ceil is the smallest integer greater than or equal to a given number.)
 > * **size** is **1.1 × Average<sub>spheres</sub>(2×r)**
-> * Given an sphere interval **[x-r, x+r]**, it is associated to the segments **1 + [ (x-r-x_min)/size ]** to **1 + [ (x+r-x_min)/size ]**
+> * Given an sphere interval **[x-r, x+r]**, it is associated to the segments **1 + [ (x-r-x_min)/size ]** to **1 + [ (x+r-x_min)/size ]**  (note: ***[ a ]*** is the integer part of *** a ***)
 
 We propose a class that calculates the partitioning parameters and provides functions to 
 * The total number of partitions
