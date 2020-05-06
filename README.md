@@ -107,31 +107,32 @@ A possible algorithm based on groups:
 Var collitions := []
 Var partitioner := initPartitioner(spheres);
 For sphere_a in spheres
-  For sphere_b in collidedSpheres(partitioner, sphere_a)
-    collitions.add( Pair(sphere_a, sphere_b ));
+  For sphere_b in listPotentiallyCollided(partitioner, sphere_a)
+    If intersect(sphere, sphere_b) 
+      collitions.add( Pair(sphere_a, sphere_b ));
+    End
   End
-  
   addSphereToPartitioner(partitioner, sphere_a)
 End
 
-Function collidedSpheres(partitioner, sphere) as
-  Var collided := []
+Function listPotentiallyCollided(partitioner, sphere) as
+  Var potentiallyCollided := []
   For group in enumerateSphereGroups(partitioner, sphere)
     For sphere_b in group     
-      If intersect(sphere, sphere_b) && !contains(collided, sphere_b)
-        add(collided, sphere_b)
+      If !contains(potentiallyCollided, sphere_b)
+        add(potentiallyCollided, sphere_b)
       End
     End
   End
 
-  Return collided;
+  Return potentiallyCollided;
 End
 
 
 ```
 Note than:
 * Initially, ``partitioner`` contains empty groups:  each sphere is added to a group AFTER checking possible collitions. For this reason, 2 spheres are not processed in "different" order  (When you process Sphere[1], Sphere[2] has not been processed yet and it is not present in any group).
-* Because 2 spheres can share 2 or more groups, it is required to check  ``!contains(collided, sphere_b)``.  This is cleanly a performance Issue that must be solved in each concrete implementation (i.e:  Hash<int,Sphere> that stores an unique "key" associated to sphere_b)
+* Because 2 spheres can share 2 or more groups, it is required to check  ``!contains(potentiallyCollided, sphere_b)``.  This is cleanly a performance Issue that must be solved in each concrete implementation (i.e:  Hash<int,Sphere> that stores an unique "key" associated to sphere_b)
 
 ### The Complexity
 
