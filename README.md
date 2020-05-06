@@ -229,7 +229,7 @@ The best option is to adjust the size of each segment to a value next to the ave
 * Spheres radius **r** has a very low variance (all radius are very similar).
 * Spheres **x** coordinate has an uniform distribution (All partitions contain a similar number of spheres).
 
-An "small" adjustment is to multiply average by 1.1 factor (supossing a constant variance):
+An "small" adjustment is to multiply average by 1.1 factor (supossing a low variance):
 * Using average as partition size causes a lot of spheres to occupy 3 partitions instead 2 (because there is, potentially, half of spheres bigger than the average). 
 * Using a value bigger than average minimizes this problem.
 
