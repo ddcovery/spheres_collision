@@ -21,10 +21,6 @@ As we will see, the different strategies try to minimize the number of times we 
 
 Let's start with a simpliest problem:  2 circles intersection.
 
-If we express each circle as a center *(x,y)* and a radius *r*, how we can express a intersection condition?
-
-First, we need to find a formal definition for the "intersect" concept:
-
 > Two circles intersect (collide) when the **distance between its centers** is **smaller** than the **sum of their radii**.
 
 That is:  
@@ -40,7 +36,6 @@ where
 If we use the coordinates of the centers **(x<sub>a</sub>,y<sub>a</sub>)** and **(x<sub>b</sub>,y<sub>b</sub>)**, the **distance between their centers** can be solved using Pythagorean theorem:
 
 >  (x<sub>b</sub> - x<sub>a</sub>)² + (y<sub>b</sub> - y<sub>a</sub>)² = d²<sub>ab</sub>
-
 
 The original intersection expression now can be expressed as
 
