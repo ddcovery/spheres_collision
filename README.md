@@ -60,27 +60,27 @@ end
 
 ## The Brute Force Algorithm
 
-Given a set of N spheres, a brute force strategy will check the intersection of all possible spheres pairs
+Given a set of N spheres, a brute force strategy will check the collition of all possible spheres pairs
 
 ```pascal
-Var intersected := []
+Var collitions := []
 For sphere_a in spheres
   For sphere_b in spheres
     If( sphere_a != sphere_b and intersect(sphere_a, sphere_b) )      
-      intersected.add( Pair(sphere_a, sphere_b) );
+      collitions.add( Pair(sphere_a, sphere_b) );
     End
   End
 End
 ```
 
-Upps, this generates 2 pairs of spheres for each intersection.  Let's correct it this way
+Upps, this generates 2 pairs of spheres for each collition.  Let's correct it this way
 
 ```pascal
-Var intersected := []
+Var collitions := []
 For a:=1 to count(spheres)-1
   For b:=a+1 to count(spheres)
     If intersect( spheres[a], spheres[b])
-      intersected.add( Pair(spheres[a], spheres[b]) )
+      collitions.add( Pair(spheres[a], spheres[b]) )
     End
   End
 End
@@ -104,15 +104,18 @@ As a corolay
 A possible algorithm based on groups:
 
 ```pascal
-Var collitions := []
-Var partitioner := initPartitioner(spheres);
-For sphere_a in spheres
-  For sphere_b in listPotentiallyCollided(partitioner, sphere_a)
-    If intersect(sphere, sphere_b) 
-      collitions.add( Pair(sphere_a, sphere_b ));
+Function listCollitions(spheres)
+  Var collitions := []
+  Var partitioner := initPartitioner(spheres)
+  For sphere_a in spheres
+    For sphere_b in listPotentiallyCollided(partitioner, sphere_a)
+      If intersect(sphere_a, sphere_b) 
+        collitions.add( Pair(sphere_a, sphere_b ))
+      End
     End
+    addSphereToPartitioner(partitioner, sphere_a)
   End
-  addSphereToPartitioner(partitioner, sphere_a)
+  return collitions;
 End
 
 Function listPotentiallyCollided(partitioner, sphere) as
@@ -125,7 +128,7 @@ Function listPotentiallyCollided(partitioner, sphere) as
     End
   End
 
-  Return potentiallyCollided;
+  Return potentiallyCollided
 End
 
 
