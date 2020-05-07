@@ -17,7 +17,7 @@ This is, basically, a study to propose both algorithmic strategies and its imple
 
 ## The spheres intersection
 
-As we will see, the different strategies try to minimize the number of times we have test possible collisions between any pair of spheres. But before that, let's explain what it means that 2 spheres collide.
+As we will see, the different strategies try to minimize the number of times we test possible collisions between any pair of spheres. But before that, let's explain what it means that 2 spheres collide.
 
 Let's start with a simpliest problem:  2 circles intersection.
 
