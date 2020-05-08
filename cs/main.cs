@@ -13,6 +13,7 @@ namespace collisions
       Sphere[] spheres = Utils.readFile("../data/spheres.dat");
 
       Utils.crono("Using partitions", () => Algorithms.findCollisionsUsingPartitions(spheres), 10);
+      Utils.crono("Using partitions 2", () => Algorithms.findCollisionsUsingPartitions2(spheres), 10);
       Utils.crono("Using brute force", () => Algorithms.findCollisionsUsingBruteforce(spheres));
 
       Console.ReadKey();
