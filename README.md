@@ -274,24 +274,18 @@ Class Partitioner
 
   // Class initializer
   constructor(spheres: Sphere[])
-
-    If count(spheres) == 0
-      this.x_min = +Infinite
-      this.size = +Infinite      
-    Else
-      Var x_min: real := spheres[1].x
-      Var x_max: real := spheres[1].x
-      Var r_sum: real := spheres[1].r
-      For n:=2 To count(spheres)
-        If sphere.x<x_min Then x_min:=sphere.x
-        If sphere.x>x_max Then x_max:=sphere.x
-        r_sum := r_sum + r
-      End
-      Var avg = ( r_sum * 2 ) / count(spheres);
-      this.x_min := x_min
-      this.x_max := x_max
-      this.size := 1.1 * avg;
+    Var x_min: real := spheres[1].x
+    Var x_max: real := spheres[1].x
+    Var r_sum: real := spheres[1].r
+    For n:=2 To count(spheres)
+      If sphere.x<x_min Then x_min:=sphere.x
+      If sphere.x>x_max Then x_max:=sphere.x
+      r_sum := r_sum + r
     End
+    Var avg = ( r_sum * 2 ) / count(spheres);
+    this.x_min := x_min
+    this.x_max := x_max
+    this.size := 1.1 * avg;
   End 
   // Gets the partition number associated to an x value
   // remarks: Partition is 1 for the first one.
